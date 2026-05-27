@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BookLeaf — Admin Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--cream:#FAF7F2;--brown:#2C1810;--gold:#C9A84C;--gold-light:#E8C97A;--rust:#8B3A2A;--sage:#5A7A5F;--text:#1A1208;--muted:#7A6A5A;--border:rgba(44,24,16,.1)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--cream);font-family:'DM Sans',sans-serif;color:var(--text);min-height:100vh}
+.topbar{background:var(--brown);padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:58px;position:sticky;top:0;z-index:100}
+.topbar-brand{font-family:'Playfair Display',serif;color:var(--gold-light);font-size:20px;font-weight:600}
+.topbar-right{display:flex;align-items:center;gap:14px}
+.admin-badge{background:rgba(201,168,76,.2);color:var(--gold-light);padding:3px 10px;border-radius:20px;font-size:11px;letter-spacing:.5px}
+.btn-logout{background:transparent;border:1px solid rgba(201,168,76,.3);color:var(--gold-light);padding:6px 14px;border-radius:2px;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
+.btn-logout:hover{background:rgba(201,168,76,.1)}
+.layout{display:flex;height:calc(100vh - 58px)}
+.sidebar{width:220px;background:#fff;border-right:1px solid var(--border);flex-shrink:0;overflow-y:auto}
+.nav-item{padding:12px 20px;font-size:13px;color:var(--muted);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:10px;border-left:3px solid transparent}
+.nav-item:hover{background:var(--cream);color:var(--brown)}
+.nav-item.active{background:var(--cream);color:var(--brown);border-left-color:var(--gold);font-weight:500}
+.content{flex:1;overflow-y:auto;padding:28px 28px}
+
+/* Authors list view */
+.filters{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;align-items:center}
+.search-box{padding:9px 14px;border:1px solid var(--border);border-radius:2px;font-family:'DM Sans',sans-serif;font-size:13px;width:220px;background:var(--cream);outline:none;color:var(--text)}
+.search-box:focus{border-color:var(--gold)}
+select.filter-select{padding:9px 12px;border:1px solid var(--border);border-radius:2px;font-family:'DM Sans',sans-serif;font-size:13px;background:var(--cream);color:var(--text);outline:none;cursor:pointer}
+select.filter-select:focus{border-color:var(--gold)}
+.btn-bulk{background:var(--brown);color:var(--gold-light);border:none;padding:9px 18px;border-radius:2px;font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer;letter-spacing:.5px;margin-left:auto;transition:background .2s}
+.btn-bulk:hover{background:#3d2015}
+.btn-bulk:disabled{opacity:.6;cursor:not-allowed}
+.authors-table{width:100%;border-collapse:collapse;background:#fff;border-radius:2px;overflow:hidden;box-shadow:0 1px 8px rgba(44,24,16,.06);border:1px solid var(--border)}
+.authors-table th{background:var(--brown);color:var(--gold-light);padding:11px 14px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.8px;font-weight:500}
+.authors-table td{padding:13px 14px;border-bottom:1px solid rgba(44,24,16,.06);font-size:13px;vertical-align:middle}
+.authors-table tr:last-child td{border-bottom:none}
+.authors-table tr:hover td{background:rgba(201,168,76,.04);cursor:pointer}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500}
+.badge-green{background:rgba(90,122,95,.12);color:#388E3C}
+.badge-yellow{background:rgba(255,152,0,.12);color:#E65100}
+.badge-red{background:rgba(244,67,54,.1);color:#C62828}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px}
+.dot-green{background:#4CAF50}.dot-yellow{background:#FF9800}.dot-red{background:#f44336}
+.page-title{font-family:'Playfair Display',serif;font-size:24px;font-weight:600;color:var(--brown);margin-bottom:4px}
+.page-sub{color:var(--muted);font-size:13px;margin-bottom:20px}
+
+/* Author detail view */
+.back-btn{display:inline-flex;align-items:center;gap:6px;color:var(--gold);font-size:13px;cursor:pointer;margin-bottom:20px;padding:6px 0;border:none;background:none;font-family:'DM Sans',sans-serif}
+.back-btn:hover{color:var(--brown)}
+.author-detail-header{background:#fff;border-radius:2px;padding:22px 24px;margin-bottom:20px;box-shadow:0 1px 8px rgba(44,24,16,.06);border:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start}
+.author-name-big{font-family:'Playfair Display',serif;font-size:22px;font-weight:600;color:var(--brown);margin-bottom:4px}
+.author-meta-row{display:flex;gap:16px;flex-wrap:wrap}
+.author-meta-item{font-size:12px;color:var(--muted)}
+.btn-generate{background:var(--rust);color:#fff;border:none;padding:10px 20px;border-radius:2px;font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer;letter-spacing:.5px;text-transform:uppercase;transition:background .2s;font-weight:500}
+.btn-generate:hover{background:#6d2d1f}
+.btn-generate:disabled{opacity:.6;cursor:not-allowed}
+.summary-grid-small{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.stat-sm{background:#fff;border-radius:2px;padding:16px 18px;box-shadow:0 1px 8px rgba(44,24,16,.06);border:1px solid var(--border)}
+.stat-sm-label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:500;margin-bottom:6px}
+.stat-sm-value{font-size:20px;font-weight:300;font-family:'Playfair Display',serif}
+.stat-sm-value.earned{color:var(--sage)}.stat-sm-value.paid{color:var(--gold)}.stat-sm-value.pending{color:var(--rust)}
+.book-card{background:#fff;border-radius:2px;margin-bottom:12px;box-shadow:0 1px 6px rgba(44,24,16,.06);border:1px solid var(--border);overflow:hidden}
+.book-header{padding:16px 20px 12px;border-bottom:1px solid var(--border)}
+.book-title{font-family:'Playfair Display',serif;font-size:15px;font-weight:600;color:var(--brown);margin-bottom:4px}
+.book-meta{display:flex;gap:10px;flex-wrap:wrap}
+.book-meta span{font-size:11px;color:var(--muted)}
+.book-royalty-row{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding:12px 20px}
+.ri-label{font-size:10px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);font-weight:500;margin-bottom:4px}
+.ri-value{font-size:14px;color:var(--text)}
+.ri-value.earned{color:var(--sage)}.ri-value.paid{color:var(--gold)}.ri-value.pending{color:var(--rust)}
+.inprod-notice{padding:12px 20px;font-size:12px;color:#7A5A10;background:rgba(201,168,76,.07);border-top:1px solid rgba(201,168,76,.15)}
+.platforms-row{padding:8px 20px;display:flex;gap:5px;flex-wrap:wrap;border-top:1px solid rgba(44,24,16,.05)}
+.platform-tag{background:var(--cream);border:1px solid var(--border);padding:2px 9px;border-radius:20px;font-size:11px;color:var(--muted)}
+.result-toast{padding:12px 16px;border-radius:2px;margin-top:12px;font-size:13px;display:none}
+.toast-success{background:rgba(90,122,95,.1);border:1px solid rgba(90,122,95,.2);color:var(--sage)}
+.toast-error{background:rgba(139,58,42,.08);border:1px solid rgba(139,58,42,.2);color:var(--rust)}
+
+/* Notification log */
+.log-table{width:100%;border-collapse:collapse;background:#fff;border-radius:2px;overflow:hidden;box-shadow:0 1px 8px rgba(44,24,16,.06);border:1px solid var(--border)}
+.log-table th{background:var(--brown);color:var(--gold-light);padding:11px 14px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.8px;font-weight:500}
+.log-table td{padding:11px 14px;border-bottom:1px solid rgba(44,24,16,.06);font-size:12px;vertical-align:top}
+.log-table tr:last-child td{border-bottom:none}
+.email-preview{max-width:400px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted);font-size:11px;cursor:pointer}
+.email-preview:hover{color:var(--brown)}
+.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:1000;display:none;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:#fff;border-radius:2px;max-width:660px;width:90%;max-height:80vh;overflow:hidden;box-shadow:0 4px 40px rgba(0,0,0,.2)}
+.modal-header{background:var(--brown);padding:16px 20px;display:flex;justify-content:space-between;align-items:center}
+.modal-header h3{font-family:'Playfair Display',serif;color:var(--gold-light);font-size:16px;font-weight:600}
+.modal-close{background:none;border:none;color:var(--gold-light);font-size:20px;cursor:pointer;line-height:1}
+.modal-body{padding:20px;overflow-y:auto;max-height:calc(80vh - 60px)}
+.email-content{white-space:pre-wrap;font-size:13px;line-height:1.7;color:var(--text);font-family:'DM Sans',sans-serif}
+
+.loading{text-align:center;padding:40px;color:var(--muted);font-size:14px}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-brand">📚 BookLeaf Admin</div>
+  <div class="topbar-right">
+    <span class="admin-badge">Operations Team</span>
+    <button class="btn-logout" onclick="logout()">Sign Out</button>
+  </div>
+</div>
+<div class="layout">
+  <div class="sidebar">
+    <div class="nav-item active" id="nav-authors" onclick="showView('authors')">👥 Authors</div>
+    <div class="nav-item" id="nav-logs" onclick="showView('logs')">📋 Notification Log</div>
+  </div>
+  <div class="content" id="mainContent">
+    <div class="loading">Loading...</div>
+  </div>
+</div>
+
+<!-- Email modal -->
+<div class="modal-overlay" id="emailModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Generated Royalty Email</h3>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="email-content" id="modalEmailContent"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const token = localStorage.getItem('bl_token');
+const role = localStorage.getItem('bl_role');
+if (!token || role !== 'admin') { window.location.href = '/'; }
+
+let currentView = 'authors';
+let authorsData = [];
+let citiesList = [];
+
+function logout() { localStorage.clear(); window.location.href = '/'; }
+function fmt(n) { return '₹' + Number(n||0).toLocaleString('en-IN'); }
+function fmtDate(d) { if(!d) return 'Never'; return new Date(d).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}); }
+function fmtDateTime(d) { if(!d) return '—'; return new Date(d).toLocaleString('en-IN',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}); }
+
+const statusInfo = {
+  green:{label:'Fully Paid',badge:'badge-green',dot:'dot-green'},
+  yellow:{label:'Pending',badge:'badge-yellow',dot:'dot-yellow'},
+  red:{label:'Overdue',badge:'badge-red',dot:'dot-red'},
+  none:{label:'—',badge:'',dot:''}
+};
+
+function showView(view) {
+  currentView = view;
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('nav-'+view)?.classList.add('active');
+  if(view==='authors') loadAuthorsView();
+  else if(view==='logs') loadLogsView();
+}
+
+async function loadAuthorsView(city='',status='',search='') {
+  const content = document.getElementById('mainContent');
+  content.innerHTML = '<div class="loading">Loading authors...</div>';
+  try {
+    const [authRes, cityRes] = await Promise.all([
+      fetch(`/api/admin/authors?city=${city}&status=${status}&search=${search}`,{headers:{'Authorization':'Bearer '+token}}),
+      fetch('/api/admin/cities',{headers:{'Authorization':'Bearer '+token}})
+    ]);
+    if(authRes.status===401){logout();return}
+    authorsData = await authRes.json();
+    citiesList = await cityRes.json();
+
+    const pendingAuthors = authorsData.filter(a=>a.summary.total_pending>0);
+
+    content.innerHTML = `
+      <div class="page-title">Authors Overview</div>
+      <div class="page-sub">${authorsData.length} author${authorsData.length!==1?'s':''} found</div>
+      <div class="filters">
+        <input class="search-box" id="searchInput" placeholder="Search by name..." value="${search}" oninput="applyFilters()">
+        <select class="filter-select" id="cityFilter" onchange="applyFilters()">
+          <option value="">All Cities</option>
+          ${citiesList.map(c=>`<option value="${c}" ${c===city?'selected':''}>${c}</option>`).join('')}
+        </select>
+        <select class="filter-select" id="statusFilter" onchange="applyFilters()">
+          <option value="">All Status</option>
+          <option value="paid" ${status==='paid'?'selected':''}>Fully Paid</option>
+          <option value="pending" ${status==='pending'?'selected':''}>Pending</option>
+          <option value="overdue" ${status==='overdue'?'selected':''}>Overdue</option>
+        </select>
+        <button class="btn-bulk" id="bulkBtn" onclick="triggerBulk()" ${pendingAuthors.length===0?'disabled':''}>
+          ⚡ Bulk Send (${pendingAuthors.length} pending)
+        </button>
+      </div>
+      <table class="authors-table">
+        <thead><tr>
+          <th>Author</th><th>City</th><th>Books</th><th>Total Earned</th><th>Total Pending</th><th>Status</th>
+        </tr></thead>
+        <tbody>
+          ${authorsData.length===0?`<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--muted)">No authors found</td></tr>`
+            :authorsData.map(a=>{
+              const si=statusInfo[a.overall_status]||statusInfo.none;
+              return `<tr onclick="showAuthorDetail('${a.author.id}')">
+                <td style="font-weight:500">${a.author.name}</td>
+                <td>${a.author.city}</td>
+                <td>${a.summary.total_books}</td>
+                <td style="color:var(--sage)">${fmt(a.summary.total_earned)}</td>
+                <td style="color:var(--rust)">${fmt(a.summary.total_pending)}</td>
+                <td><span class="dot ${si.dot}"></span><span class="badge ${si.badge}">${si.label}</span></td>
+              </tr>`;}).join('')}
+        </tbody>
+      </table>`;
+  } catch(e) {
+    content.innerHTML = '<div class="loading">Error loading data.</div>';
+  }
+}
+
+function applyFilters() {
+  const search = document.getElementById('searchInput')?.value||'';
+  const city = document.getElementById('cityFilter')?.value||'';
+  const status = document.getElementById('statusFilter')?.value||'';
+  loadAuthorsView(city,status,search);
+}
+
+async function showAuthorDetail(authorId) {
+  const content = document.getElementById('mainContent');
+  content.innerHTML = '<div class="loading">Loading author...</div>';
+  try {
+    const res = await fetch(`/api/admin/author/${authorId}`,{headers:{'Authorization':'Bearer '+token}});
+    const data = await res.json();
+    const a = data.author;
+    const si = statusInfo[data.overall_status]||statusInfo.none;
+
+    content.innerHTML = `
+      <button class="back-btn" onclick="showView('authors')">← Back to Authors</button>
+      <div class="author-detail-header">
+        <div>
+          <div class="author-name-big">${a.name}</div>
+          <div class="author-meta-row">
+            <span class="author-meta-item">📍 ${a.city}</span>
+            <span class="author-meta-item">✉️ ${a.email}</span>
+            <span class="author-meta-item">📚 ${data.summary.total_books} book${data.summary.total_books!==1?'s':''}</span>
+            <span><span class="dot ${si.dot}"></span><span class="badge ${si.badge}">${si.label}</span></span>
+          </div>
+        </div>
+        <button class="btn-generate" id="generateBtn-${a.id}" onclick="triggerGenerate('${a.id}','${a.name}')">
+          ✉️ Generate & Send Royalty Summary
+        </button>
+      </div>
+      <div id="generateResult-${a.id}"></div>
+      <div class="summary-grid-small">
+        <div class="stat-sm"><div class="stat-sm-label">Total Earned</div><div class="stat-sm-value earned">${fmt(data.summary.total_earned)}</div></div>
+        <div class="stat-sm"><div class="stat-sm-label">Total Paid</div><div class="stat-sm-value paid">${fmt(data.summary.total_paid)}</div></div>
+        <div class="stat-sm"><div class="stat-sm-label">Total Pending</div><div class="stat-sm-value pending">${fmt(data.summary.total_pending)}</div></div>
+      </div>
+      <div style="font-family:'Playfair Display',serif;font-size:17px;color:var(--brown);margin-bottom:14px">Books</div>
+      ${data.books.map(book=>{
+        const bsi=statusInfo[book.royalty_status]||statusInfo.none;
+        const r=book.royalty;
+        const isProd=book.status==='In Production';
+        return `<div class="book-card">
+          <div class="book-header" style="display:flex;justify-content:space-between;align-items:flex-start">
+            <div>
+              <div class="book-title">${book.title}</div>
+              <div class="book-meta">
+                <span>${book.genre}</span><span>ISBN: ${book.isbn}</span><span>MRP ₹${book.mrp}</span>
+                ${book.publication_date?`<span>Published: ${fmtDate(book.publication_date)}</span>`:''}
+                <span class="badge ${isProd?'badge-yellow':'badge-green'}">${book.status}</span>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:5px;flex-shrink:0">
+              <span class="dot ${bsi.dot}"></span><span style="font-size:12px">${bsi.label}</span>
+            </div>
+          </div>
+          ${isProd?`<div class="inprod-notice">📖 In Production — royalty data pending publication</div>`
+            :r?`<div class="book-royalty-row">
+              <div><div class="ri-label">Copies Sold</div><div class="ri-value">${r.total_copies_sold.toLocaleString()}</div></div>
+              <div><div class="ri-label">Earned</div><div class="ri-value earned">${fmt(r.total_royalty_earned)}</div></div>
+              <div><div class="ri-label">Paid</div><div class="ri-value paid">${fmt(r.royalty_paid)}</div></div>
+              <div><div class="ri-label">Pending</div><div class="ri-value pending">${fmt(r.royalty_pending)}</div></div>
+              <div><div class="ri-label">Last Payout</div><div class="ri-value">${fmtDate(r.last_payout_date)}</div></div>
+            </div>`:'<div style="padding:12px 20px;font-size:12px;color:var(--muted)">No royalty data</div>'}
+          <div class="platforms-row">${book.platforms.map(p=>`<span class="platform-tag">${p}</span>`).join('')}
+          <span class="platform-tag" style="background:rgba(44,24,16,.05)">📦 ${book.print_partner}</span></div>
+        </div>`;
+      }).join('')}`;
+  } catch(e) {
+    content.innerHTML = '<div class="loading">Error loading author.</div>';
+  }
+}
+
+async function triggerGenerate(authorId, authorName) {
+  const btn = document.getElementById(`generateBtn-${authorId}`);
+  const resultDiv = document.getElementById(`generateResult-${authorId}`);
+  btn.disabled = true;
+  btn.textContent = '⏳ Generating...';
+  resultDiv.innerHTML = '';
+
+  try {
+    const res = await fetch('/api/webhook/generate-royalty-summary', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json','x-webhook-secret':'bookleaf_webhook_secret_2024'},
+      body: JSON.stringify({author_id: authorId})
+    });
+    const data = await res.json();
+
+    if (res.status === 429) {
+      resultDiv.innerHTML = `<div class="result-toast toast-error" style="display:block">⚠️ ${data.error}</div>`;
+    } else if (data.success) {
+      resultDiv.innerHTML = `<div class="result-toast toast-success" style="display:block">
+        ✅ Royalty summary generated for ${authorName}. 
+        <a href="#" style="color:var(--sage);text-decoration:underline" onclick="showEmail(\`${escapeHtml(data.email_content)}\`)">View Email</a>
+      </div>`;
+    } else {
+      resultDiv.innerHTML = `<div class="result-toast toast-error" style="display:block">❌ ${data.email_content || 'Generation failed'}</div>`;
+    }
+  } catch(e) {
+    resultDiv.innerHTML = `<div class="result-toast toast-error" style="display:block">❌ Request failed. Check server.</div>`;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '✉️ Generate & Send Royalty Summary';
+  }
+}
+
+async function triggerBulk() {
+  const btn = document.getElementById('bulkBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Triggering...';
+  try {
+    const res = await fetch('/api/webhook/generate-royalty-summary-bulk',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-webhook-secret':'bookleaf_webhook_secret_2024'},
+      body:JSON.stringify({})
+    });
+    const data = await res.json();
+    alert(`Bulk trigger initiated for ${data.authors?.length||0} authors with pending royalties.`);
+  } catch(e) {
+    alert('Bulk trigger failed.');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '⚡ Bulk Send';
+  }
+}
+
+async function loadLogsView() {
+  const content = document.getElementById('mainContent');
+  content.innerHTML = '<div class="loading">Loading logs...</div>';
+  try {
+    const res = await fetch('/api/admin/notifications',{headers:{'Authorization':'Bearer '+token}});
+    const logs = await res.json();
+    content.innerHTML = `
+      <div class="page-title">Notification Log</div>
+      <div class="page-sub">History of all royalty summary triggers</div>
+      <table class="log-table">
+        <thead><tr><th>Author</th><th>Status</th><th>Sent At</th><th>Email Preview</th></tr></thead>
+        <tbody>
+          ${logs.length===0?`<tr><td colspan="4" style="text-align:center;padding:30px;color:var(--muted)">No notifications sent yet.</td></tr>`
+            :logs.map(l=>`<tr>
+              <td><strong>${l.author_name}</strong><br><span style="color:var(--muted);font-size:11px">${l.author_email||''}</span></td>
+              <td><span class="badge ${l.status==='Success'?'badge-green':'badge-red'}">${l.status}</span></td>
+              <td>${fmtDateTime(l.timestamp)}</td>
+              <td><div class="email-preview" onclick="showEmail(\`${escapeHtml(l.email_content)}\`)" title="Click to view full email">${l.email_content?.substring(0,80)||'—'}...</div></td>
+            </tr>`).join('')}
+        </tbody>
+      </table>`;
+  } catch(e) {
+    content.innerHTML = '<div class="loading">Error loading logs.</div>';
+  }
+}
+
+function showEmail(content) {
+  document.getElementById('modalEmailContent').textContent = content;
+  document.getElementById('emailModal').classList.add('open');
+}
+function closeModal() { document.getElementById('emailModal').classList.remove('open'); }
+document.getElementById('emailModal').addEventListener('click', e => { if(e.target.id==='emailModal') closeModal(); });
+
+function escapeHtml(s) { if(!s) return ''; return s.replace(/`/g,"'").replace(/\\/g,'\\\\'); }
+
+showView('authors');
+</script>
+</body>
+</html>

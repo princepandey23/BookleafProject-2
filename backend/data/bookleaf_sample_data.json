@@ -1,0 +1,517 @@
+{
+  "authors": [
+    {
+      "id": "A001",
+      "name": "Arjun Sharma",
+      "email": "arjun@example.com",
+      "password": "author123",
+      "city": "Delhi",
+      "phone": "+91-9810001001",
+      "role": "author"
+    },
+    {
+      "id": "A002",
+      "name": "Priya Mehta",
+      "email": "priya@example.com",
+      "password": "author123",
+      "city": "Mumbai",
+      "phone": "+91-9820002002",
+      "role": "author"
+    },
+    {
+      "id": "A003",
+      "name": "Rahul Verma",
+      "email": "rahul@example.com",
+      "password": "author123",
+      "city": "Bangalore",
+      "phone": "+91-9830003003",
+      "role": "author"
+    },
+    {
+      "id": "A004",
+      "name": "Sneha Patel",
+      "email": "sneha@example.com",
+      "password": "author123",
+      "city": "Ahmedabad",
+      "phone": "+91-9840004004",
+      "role": "author"
+    },
+    {
+      "id": "A005",
+      "name": "Vikram Singh",
+      "email": "vikram@example.com",
+      "password": "author123",
+      "city": "Jaipur",
+      "phone": "+91-9850005005",
+      "role": "author"
+    },
+    {
+      "id": "A006",
+      "name": "Ananya Das",
+      "email": "ananya@example.com",
+      "password": "author123",
+      "city": "Kolkata",
+      "phone": "+91-9860006006",
+      "role": "author"
+    },
+    {
+      "id": "A007",
+      "name": "Rohan Gupta",
+      "email": "rohan@example.com",
+      "password": "author123",
+      "city": "Pune",
+      "phone": "+91-9870007007",
+      "role": "author"
+    },
+    {
+      "id": "A008",
+      "name": "Meera Nair",
+      "email": "meera@example.com",
+      "password": "author123",
+      "city": "Chennai",
+      "phone": "+91-9880008008",
+      "role": "author"
+    },
+    {
+      "id": "A009",
+      "name": "Aditya Kumar",
+      "email": "aditya@example.com",
+      "password": "author123",
+      "city": "Hyderabad",
+      "phone": "+91-9890009009",
+      "role": "author"
+    },
+    {
+      "id": "A010",
+      "name": "Kavya Reddy",
+      "email": "kavya@example.com",
+      "password": "author123",
+      "city": "Lucknow",
+      "phone": "+91-9800010010",
+      "role": "author"
+    }
+  ],
+  "admin": {
+    "id": "ADM001",
+    "name": "BookLeaf Admin",
+    "email": "admin@bookleaf.com",
+    "password": "admin123",
+    "role": "admin"
+  },
+  "books": [
+    {
+      "id": "B001",
+      "author_id": "A001",
+      "title": "The Delhi Chronicles",
+      "isbn": "978-81-001-0001-1",
+      "genre": "Fiction",
+      "status": "Published",
+      "publication_date": "2022-03-15",
+      "mrp": 350,
+      "platforms": [
+        "Amazon",
+        "Flipkart",
+        "BookLeaf Store"
+      ],
+      "print_partner": "In-House"
+    },
+    {
+      "id": "B002",
+      "author_id": "A001",
+      "title": "Monsoon Diaries",
+      "isbn": "978-81-001-0002-8",
+      "genre": "Poetry",
+      "status": "Published",
+      "publication_date": "2023-07-20",
+      "mrp": 250,
+      "platforms": [
+        "Amazon",
+        "BookLeaf Store"
+      ],
+      "print_partner": "Repro India"
+    },
+    {
+      "id": "B003",
+      "author_id": "A002",
+      "title": "Mumbai Nights",
+      "isbn": "978-81-002-0001-5",
+      "genre": "Thriller",
+      "status": "Published",
+      "publication_date": "2021-11-10",
+      "mrp": 399,
+      "platforms": [
+        "Amazon",
+        "Flipkart",
+        "Snapdeal"
+      ],
+      "print_partner": "Epitome Books"
+    },
+    {
+      "id": "B004",
+      "author_id": "A002",
+      "title": "Whispers of the Sea",
+      "isbn": "978-81-002-0002-2",
+      "genre": "Romance",
+      "status": "In Production",
+      "publication_date": null,
+      "mrp": 299,
+      "platforms": [],
+      "print_partner": "In-House"
+    },
+    {
+      "id": "B005",
+      "author_id": "A003",
+      "title": "Code & Canvas",
+      "isbn": "978-81-003-0001-9",
+      "genre": "Non-Fiction",
+      "status": "Published",
+      "publication_date": "2022-08-05",
+      "mrp": 450,
+      "platforms": [
+        "Amazon",
+        "Flipkart"
+      ],
+      "print_partner": "Repro India"
+    },
+    {
+      "id": "B006",
+      "author_id": "A004",
+      "title": "Salt & Spice: An Indian Kitchen",
+      "isbn": "978-81-004-0001-6",
+      "genre": "Cookbook",
+      "status": "Published",
+      "publication_date": "2023-01-18",
+      "mrp": 550,
+      "platforms": [
+        "Amazon",
+        "Flipkart",
+        "BookLeaf Store"
+      ],
+      "print_partner": "Epitome Books"
+    },
+    {
+      "id": "B007",
+      "author_id": "A005",
+      "title": "The Warrior's Path",
+      "isbn": "978-81-005-0001-3",
+      "genre": "Historical Fiction",
+      "status": "Published",
+      "publication_date": "2020-05-22",
+      "mrp": 380,
+      "platforms": [
+        "Amazon"
+      ],
+      "print_partner": "In-House"
+    },
+    {
+      "id": "B008",
+      "author_id": "A005",
+      "title": "Rajputana Rising",
+      "isbn": "978-81-005-0002-0",
+      "genre": "Historical Fiction",
+      "status": "Published",
+      "publication_date": "2022-12-01",
+      "mrp": 420,
+      "platforms": [
+        "Amazon",
+        "Flipkart"
+      ],
+      "print_partner": "Repro India"
+    },
+    {
+      "id": "B009",
+      "author_id": "A006",
+      "title": "Kolkata in Monochrome",
+      "isbn": "978-81-006-0001-0",
+      "genre": "Photography",
+      "status": "Published",
+      "publication_date": "2023-04-10",
+      "mrp": 799,
+      "platforms": [
+        "BookLeaf Store",
+        "Amazon"
+      ],
+      "print_partner": "Epitome Books"
+    },
+    {
+      "id": "B010",
+      "author_id": "A007",
+      "title": "Silicon Dreams",
+      "isbn": "978-81-007-0001-7",
+      "genre": "Sci-Fi",
+      "status": "In Production",
+      "publication_date": null,
+      "mrp": 320,
+      "platforms": [],
+      "print_partner": "In-House"
+    },
+    {
+      "id": "B011",
+      "author_id": "A007",
+      "title": "The Pune Chronicles",
+      "isbn": "978-81-007-0002-4",
+      "genre": "Fiction",
+      "status": "Published",
+      "publication_date": "2021-09-14",
+      "mrp": 340,
+      "platforms": [
+        "Amazon",
+        "Flipkart"
+      ],
+      "print_partner": "Repro India"
+    },
+    {
+      "id": "B012",
+      "author_id": "A008",
+      "title": "Backwaters",
+      "isbn": "978-81-008-0001-4",
+      "genre": "Literary Fiction",
+      "status": "Published",
+      "publication_date": "2022-06-30",
+      "mrp": 360,
+      "platforms": [
+        "Amazon",
+        "BookLeaf Store"
+      ],
+      "print_partner": "Epitome Books"
+    },
+    {
+      "id": "B013",
+      "author_id": "A009",
+      "title": "Hyderabad Hustle",
+      "isbn": "978-81-009-0001-1",
+      "genre": "Business",
+      "status": "Published",
+      "publication_date": "2023-02-28",
+      "mrp": 475,
+      "platforms": [
+        "Amazon",
+        "Flipkart",
+        "Snapdeal"
+      ],
+      "print_partner": "In-House"
+    },
+    {
+      "id": "B014",
+      "author_id": "A009",
+      "title": "The Startup Sutra",
+      "isbn": "978-81-009-0002-8",
+      "genre": "Business",
+      "status": "In Production",
+      "publication_date": null,
+      "mrp": 499,
+      "platforms": [],
+      "print_partner": "Repro India"
+    },
+    {
+      "id": "B015",
+      "author_id": "A010",
+      "title": "Mango Summers",
+      "isbn": "978-81-010-0001-8",
+      "genre": "Memoir",
+      "status": "Published",
+      "publication_date": "2021-04-05",
+      "mrp": 290,
+      "platforms": [
+        "Amazon"
+      ],
+      "print_partner": "In-House"
+    },
+    {
+      "id": "B016",
+      "author_id": "A003",
+      "title": "Beyond the Algorithm",
+      "isbn": "978-81-003-0002-6",
+      "genre": "Technology",
+      "status": "Published",
+      "publication_date": "2024-01-10",
+      "mrp": 520,
+      "platforms": [
+        "Amazon",
+        "Flipkart",
+        "BookLeaf Store"
+      ],
+      "print_partner": "Epitome Books"
+    },
+    {
+      "id": "B017",
+      "author_id": "A006",
+      "title": "Songs of the Sundarbans",
+      "isbn": "978-81-006-0002-7",
+      "genre": "Poetry",
+      "status": "In Production",
+      "publication_date": null,
+      "mrp": 220,
+      "platforms": [],
+      "print_partner": "In-House"
+    },
+    {
+      "id": "B018",
+      "author_id": "A008",
+      "title": "Spice Route",
+      "isbn": "978-81-008-0002-1",
+      "genre": "Travel",
+      "status": "Published",
+      "publication_date": "2023-09-22",
+      "mrp": 410,
+      "platforms": [
+        "Amazon",
+        "Flipkart"
+      ],
+      "print_partner": "Repro India"
+    }
+  ],
+  "royalties": [
+    {
+      "id": "R001",
+      "book_id": "B001",
+      "total_copies_sold": 1240,
+      "total_royalty_earned": 52080,
+      "royalty_paid": 52080,
+      "royalty_pending": 0,
+      "last_payout_date": "2024-09-30",
+      "royalty_rate": 0.12
+    },
+    {
+      "id": "R002",
+      "book_id": "B002",
+      "total_copies_sold": 620,
+      "total_royalty_earned": 18600,
+      "royalty_paid": 12400,
+      "royalty_pending": 6200,
+      "last_payout_date": "2024-06-30",
+      "royalty_rate": 0.12
+    },
+    {
+      "id": "R003",
+      "book_id": "B003",
+      "total_copies_sold": 3100,
+      "total_royalty_earned": 148800,
+      "royalty_paid": 148800,
+      "royalty_pending": 0,
+      "last_payout_date": "2024-09-30",
+      "royalty_rate": 0.12
+    },
+    {
+      "id": "R005",
+      "book_id": "B005",
+      "total_copies_sold": 890,
+      "total_royalty_earned": 48195,
+      "royalty_paid": 0,
+      "royalty_pending": 48195,
+      "last_payout_date": null,
+      "royalty_rate": 0.12
+    },
+    {
+      "id": "R006",
+      "book_id": "B006",
+      "total_copies_sold": 1560,
+      "total_royalty_earned": 102960,
+      "royalty_paid": 68640,
+      "royalty_pending": 34320,
+      "last_payout_date": "2024-03-31",
+      "royalty_rate": 0.12
+    },
+    {
+      "id": "R007",
+      "book_id": "B007",
+      "total_copies_sold": 4200,
+      "total_royalty_earned": 190960,
+      "royalty_paid": 190960,
+      "royalty_pending": 0,
+      "last_payout_date": "2024-09-30",
+      "royalty_rate": 0.12
+    },
+    {
+      "id": "R008",
+      "book_id": "B008",
+      "total_copies_sold": 980,
+      "total_royalty_earned": 49392,
+      "royalty_paid": 24696,
+      "royalty_pending": 24696,
+      "last_payout_date": "2024-06-30",
+      "royalty_rate": 0.12
+    },
+    {
+      "id": "R009",
+      "book_id": "B009",
+      "total_copies_sold": 340,
+      "total_royalty_earned": 32572,
+      "royalty_paid": 0,
+      "royalty_pending": 32572,
+      "last_payout_date": null,
+      "royalty_rate": 0.12
+    },
+    {
+      "id": "R011",
+      "book_id": "B011",
+      "total_copies_sold": 1800,
+      "total_royalty_earned": 73440,
+      "royalty_paid": 73440,
+      "royalty_pending": 0,
+      "last_payout_date": "2024-09-30",
+      "royalty_rate": 0.12
+    },
+    {
+      "id": "R012",
+      "book_id": "B012",
+      "total_copies_sold": 720,
+      "total_royalty_earned": 31104,
+      "royalty_paid": 15552,
+      "royalty_pending": 15552,
+      "last_payout_date": "2024-06-30",
+      "royalty_rate": 0.12
+    },
+    {
+      "id": "R013",
+      "book_id": "B013",
+      "total_copies_sold": 550,
+      "total_royalty_earned": 31350,
+      "royalty_paid": 0,
+      "royalty_pending": 31350,
+      "last_payout_date": null,
+      "royalty_rate": 0.12
+    },
+    {
+      "id": "R015",
+      "book_id": "B015",
+      "total_copies_sold": 2200,
+      "total_royalty_earned": 76560,
+      "royalty_paid": 76560,
+      "royalty_pending": 0,
+      "last_payout_date": "2024-09-30",
+      "royalty_rate": 0.12
+    },
+    {
+      "id": "R016",
+      "book_id": "B016",
+      "total_copies_sold": 410,
+      "total_royalty_earned": 25584,
+      "royalty_paid": 12792,
+      "royalty_pending": 12792,
+      "last_payout_date": "2024-06-30",
+      "royalty_rate": 0.12
+    },
+    {
+      "id": "R018",
+      "book_id": "B018",
+      "total_copies_sold": 290,
+      "total_royalty_earned": 14268,
+      "royalty_paid": 0,
+      "royalty_pending": 14268,
+      "last_payout_date": null,
+      "royalty_rate": 0.12
+    }
+  ],
+  "notification_log": [
+    {
+      "id": "N1779877475580",
+      "author_id": "A001",
+      "author_name": "Arjun Sharma",
+      "author_email": "arjun@example.com",
+      "status": "Failed",
+      "email_content": "[Error generating summary: ANTHROPIC_API_KEY not set]",
+      "timestamp": "2026-05-27T10:24:35.580Z"
+    }
+  ]
+}

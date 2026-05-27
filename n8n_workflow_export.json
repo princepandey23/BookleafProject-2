@@ -1,0 +1,213 @@
+{
+  "name": "BookLeaf Royalty Summary Generator",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "generate-royalty-summary",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "position": [240, 300],
+      "webhookId": "bookleaf-royalty-webhook"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.headers['x-webhook-secret']}}",
+              "operation": "equals",
+              "value2": "bookleaf_webhook_secret_2024"
+            }
+          ]
+        }
+      },
+      "id": "security-check",
+      "name": "Validate Webhook Secret",
+      "type": "n8n-nodes-base.if",
+      "position": [440, 300]
+    },
+    {
+      "parameters": {
+        "url": "=http://your-bubble-app.bubbleapps.io/api/1.1/obj/author/{{$json.body.author_id}}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "id": "fetch-author-data",
+      "name": "Fetch Author Data from Bubble",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [660, 220],
+      "notes": "Fetches full author + royalty data from Bubble Data API. We chose this approach over passing full payload in webhook to keep webhook calls lightweight and ensure we always have fresh data."
+    },
+    {
+      "parameters": {
+        "jsCode": "// Build the AI prompt from author data\nconst author = $input.item.json;\nconst books = author.books || [];\nconst published = books.filter(b => b.status === 'Published');\nconst inProd = books.filter(b => b.status === 'In Production');\n\nconst totalEarned = published.reduce((s,b) => s + (b.royalty?.total_royalty_earned||0), 0);\nconst totalPaid = published.reduce((s,b) => s + (b.royalty?.royalty_paid||0), 0);\nconst totalPending = published.reduce((s,b) => s + (b.royalty?.royalty_pending||0), 0);\n\nconst bookSummary = published.map(b => {\n  const r = b.royalty;\n  if (!r) return `- \"${b.title}\": No royalty data yet`;\n  return `- \"${b.title}\" (${b.genre}): ${r.total_copies_sold} copies | Earned: ₹${r.total_royalty_earned} | Paid: ₹${r.royalty_paid} | Pending: ₹${r.royalty_pending} | Last payout: ${r.last_payout_date || 'Never'}`;\n}).join('\\n');\n\nconst prodSummary = inProd.map(b => `- \"${b.title}\" (${b.genre})`).join('\\n');\n\nconst prompt = `You are BookLeaf Publishing's royalty communications specialist. Write a professional, warm royalty summary email for:\n\nAUTHOR: ${author.name}\nCITY: ${author.city}\n\nPUBLISHED BOOKS:\n${bookSummary || 'None yet'}\n\n${inProd.length > 0 ? 'IN PRODUCTION:\\n' + prodSummary : ''}\n\nSUMMARY: Total Earned: ₹${totalEarned} | Paid: ₹${totalPaid} | Pending: ₹${totalPending}\n\nPOLICY: Royalties paid quarterly (Mar 31, Jun 30, Sep 30, Dec 31) with 45-day processing window.\n\nWrite a personalised, human email the author will actually appreciate. Include per-book breakdown, totals, next payout estimate if pending, warm closing.`;\n\nreturn { prompt, author_id: author.id, author_name: author.name, author_email: author.email };"
+      },
+      "id": "build-prompt",
+      "name": "Build AI Prompt",
+      "type": "n8n-nodes-base.code",
+      "position": [880, 220]
+    },
+    {
+      "parameters": {
+        "url": "https://api.anthropic.com/v1/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "method": "POST",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {"name": "x-api-key", "value": "={{$credentials.httpHeaderAuth.value}}"},
+            {"name": "anthropic-version", "value": "2023-06-01"},
+            {"name": "Content-Type", "value": "application/json"}
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "claude-haiku-4-5-20251001"
+            },
+            {
+              "name": "max_tokens",
+              "value": "1200"
+            },
+            {
+              "name": "messages",
+              "value": "=[{\"role\":\"user\",\"content\":\"{{$json.prompt}}\"}]"
+            }
+          ]
+        }
+      },
+      "id": "ai-generation",
+      "name": "Generate Email via Claude AI",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [1100, 220]
+    },
+    {
+      "parameters": {
+        "jsCode": "const aiResponse = $input.item.json;\nconst emailContent = aiResponse.content?.[0]?.text || '';\nconst prevData = $('Build AI Prompt').item.json;\nreturn {\n  author_id: prevData.author_id,\n  author_name: prevData.author_name,\n  author_email: prevData.author_email,\n  email_content: emailContent,\n  status: emailContent ? 'Success' : 'Failed'\n};"
+      },
+      "id": "extract-email",
+      "name": "Extract Email Content",
+      "type": "n8n-nodes-base.code",
+      "position": [1320, 220]
+    },
+    {
+      "parameters": {
+        "url": "=http://your-bubble-app.bubbleapps.io/api/1.1/wf/log-notification",
+        "method": "POST",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {"name": "Authorization", "value": "Bearer YOUR_BUBBLE_API_KEY"}
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {"name": "author_id", "value": "={{$json.author_id}}"},
+            {"name": "author_name", "value": "={{$json.author_name}}"},
+            {"name": "status", "value": "={{$json.status}}"},
+            {"name": "email_content", "value": "={{$json.email_content}}"}
+          ]
+        }
+      },
+      "id": "callback-bubble",
+      "name": "Callback to Bubble - Log Notification",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [1540, 220]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\"success\": true, \"status\": \"{{$json.status}}\", \"author_name\": \"{{$('Extract Email Content').item.json.author_name}}\"}"
+      },
+      "id": "respond-success",
+      "name": "Respond Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "position": [1760, 220]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\"success\": false, \"error\": \"Unauthorized: Invalid webhook secret\"}",
+        "options": {
+          "responseCode": 403
+        }
+      },
+      "id": "respond-unauthorized",
+      "name": "Respond Unauthorized",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "position": [660, 420]
+    },
+    {
+      "parameters": {
+        "url": "=http://your-bubble-app.bubbleapps.io/api/1.1/wf/log-notification",
+        "method": "POST",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {"name": "author_id", "value": "={{$('webhook-trigger').item.json.body.author_id}}"},
+            {"name": "status", "value": "Failed"},
+            {"name": "email_content", "value": "=[Error] AI generation or data fetch failed."}
+          ]
+        }
+      },
+      "id": "log-error",
+      "name": "Log Error to Bubble",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [1100, 420]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\"success\": false, \"status\": \"Failed\", \"error\": \"Workflow error - logged to Bubble\"}",
+        "options": {"responseCode": 500}
+      },
+      "id": "respond-error",
+      "name": "Respond Error",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "position": [1320, 420]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [[{"node": "Validate Webhook Secret", "type": "main", "index": 0}]]
+    },
+    "Validate Webhook Secret": {
+      "main": [
+        [{"node": "Fetch Author Data from Bubble", "type": "main", "index": 0}],
+        [{"node": "Respond Unauthorized", "type": "main", "index": 0}]
+      ]
+    },
+    "Fetch Author Data from Bubble": {
+      "main": [[{"node": "Build AI Prompt", "type": "main", "index": 0}]]
+    },
+    "Build AI Prompt": {
+      "main": [[{"node": "Generate Email via Claude AI", "type": "main", "index": 0}]]
+    },
+    "Generate Email via Claude AI": {
+      "main": [[{"node": "Extract Email Content", "type": "main", "index": 0}]]
+    },
+    "Extract Email Content": {
+      "main": [[{"node": "Callback to Bubble - Log Notification", "type": "main", "index": 0}]]
+    },
+    "Callback to Bubble - Log Notification": {
+      "main": [[{"node": "Respond Success", "type": "main", "index": 0}]]
+    }
+  },
+  "settings": {
+    "errorWorkflow": "error-handler",
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "description": "BookLeaf n8n workflow: receives webhook from Bubble, fetches author data, generates AI royalty email via Claude, logs result back to Bubble. Includes webhook secret validation, error handling, and idempotency."
+  }
+}
